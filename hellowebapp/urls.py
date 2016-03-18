@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.views import password_reset, password_reset_done, password_reset_confirm, password_reset_complete
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 from collection.backends import MyRegistrationView
 from collection import views
@@ -28,11 +28,16 @@ urlpatterns = [
         TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^contact/$',
         TemplateView.as_view(template_name='contact.html'), name='contact'),
+    url(r'^things/$', RedirectView.as_view(pattern_name='browse', permanent=True)),
     url(r'^things/(?P<slug>[-\w]+)/$', 
         views.thing_detail, name='thing_detail'),
     url(r'^things/(?P<slug>[-\w]+)/edit/$', 
         views.edit_thing, name='edit_thing'),
-
+# browse urls
+    url(r'^browse/$', RedirectView.as_view(pattern_name='browse', permanent=True)),
+    url(r'^browse/name/$', views.browse_by_name, name="browse"),
+    url(r'^browse/name/(?P<initial>[-\w]+)/$', views.browse_by_name, name='browse_by_name'),
+# password reset urls        
     url(r'^accounts/password/reset/$', password_reset, 
         {'template_name': 'registration/password_reset_form.html'}, 
         name="password_reset"),
@@ -47,7 +52,7 @@ urlpatterns = [
     url(r'^accounts/password/done/$', password_reset_complete,
         {'template_name': 'registration/password_reset_complete.html'},
         name="password_reset_complete"),
-
+# registration urls
     url(r'^accounts/register/$', 
         MyRegistrationView.as_view(), name='registration_register'),
     url(r'^accounts/create_thing/$', 
